@@ -1,0 +1,164 @@
+===============================
+ GAME DESIGN CLASS SPEC SHEET
+===============================
+
+1️⃣ BOARD & SQUARE
+------------------
+Class: Board
+-------------
+Methods:
+- Board(int w, int h)
+    → Constructor; sets board width and height.
+- Square* getSquare(int x, int y)
+    → Returns pointer to a specific square.
+- void initialize()
+    → Randomly assigns enemies/items to squares.
+- void displayBoard()
+    → Prints board state (optional for debugging).
+
+Class: Square
+-------------
+Methods:
+- Square()
+    → Constructor.
+- bool hasItem() const
+    → Checks if the square contains an item.
+- bool hasEnemy() const
+    → Checks if the square contains an enemy.
+- void describe() const
+    → Prints info about what’s in the square.
+- void setItem(std::shared_ptr<Item> newItem)
+    → Assigns an item to this square.
+- void setEnemy(std::shared_ptr<Character> newEnemy)
+    → Assigns an enemy to this square.
+- std::shared_ptr<Item> getItem()
+    → Returns the item pointer.
+- std::shared_ptr<Character> getEnemy()
+    → Returns the enemy pointer.
+
+
+2️⃣ CHARACTER HIERARCHY
+-----------------------
+Class: Character (abstract)
+----------------------------
+Methods:
+- virtual void attackCharacter(std::shared_ptr<Character> target) = 0
+    → Pure virtual; defines attack behavior.
+- virtual void defend(int damage) = 0
+    → Pure virtual; defines defense behavior.
+- int getHealth() const
+    → Returns character’s current health.
+- bool isAlive() const
+    → Returns true if health > 0.
+- std::string getRace() const
+    → Returns race/type name.
+
+Attributes (example):
+- int health
+- int attack
+- int defence
+- float attackChance
+- float defenceChance
+- std::string name
+
+Subclasses:
+-----------
+Hobbit : public Character  
+Human  : public Character  
+Elf    : public Character  
+Dwarf  : public Character
+
+Each subclass may override:
+- attackCharacter()
+- defend()
+- special abilities (customized inside override)
+
+Example (Elf):
+- Higher attackChance
+- Lower defence
+- Special magic ability on successful defence
+
+
+3️⃣ ITEM CLASS
+---------------
+Class: Item
+------------
+Methods:
+- Item(std::string name, int value)
+    → Constructor; creates an item.
+- std::string getName() const
+    → Returns item name.
+- int getValue() const
+    → Returns numeric value (attack or defence bonus).
+
+Subclasses (optional):
+- Weapon : public Item
+- Shield : public Item
+- Potion : public Item
+
+
+4️⃣ PLAYER CLASS
+----------------
+Class: Player : public Character
+----------------
+Methods:
+- void move(int newX, int newY)
+    → Moves player to new square coordinates.
+- void pickUpItem(std::shared_ptr<Item> item)
+    → Adds item to inventory.
+- void attackCharacter(std::shared_ptr<Character> target) override
+    → Performs attack on target.
+- void defend(int damage) override
+    → Defends against attack.
+- int getGold() const
+    → Returns gold collected.
+- void addGold(int amount)
+    → Adds gold to inventory.
+
+Attributes:
+- int gold
+- std::vector<std::shared_ptr<Item>> inventory
+- int posX, posY
+
+
+5️⃣ ENEMY CLASS
+----------------
+Class: Enemy : public Character
+----------------
+Methods:
+- void attackCharacter(std::shared_ptr<Character> target) override
+    → Enemy attack logic.
+- void defend(int damage) override
+    → Enemy defense logic.
+- int getGoldValue() const
+    → Returns gold dropped on defeat.
+
+
+6️⃣ COMBAT MANAGER
+-------------------
+Class: Combat
+-------------
+Methods:
+- static void resolveAttack(std::shared_ptr<Character> attacker, std::shared_ptr<Character> defender)
+    → Full attack/defence cycle including success chances.
+- static void handleDeath(std::shared_ptr<Player> player, std::shared_ptr<Enemy> enemy)
+    → Removes defeated enemy and transfers gold to player.
+
+
+7️⃣ GAME CONTROLLER / MAIN LOOP
+--------------------------------
+Class: Game
+-----------
+Methods:
+- void start()
+    → Starts the game loop.
+- void processCommand(std::string command)
+    → Handles player input (move, attack, quit, etc.).
+- void checkGameOver()
+    → Ends game when player health ≤ 0.
+- void displayStats()
+    → Prints player stats (health, gold, inventory).
+
+Attributes:
+- std::shared_ptr<Board> board
+- std::shared_ptr<Player> player
